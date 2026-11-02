@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && request.auth.token.email == 'sunnykumar776289@gmail.com';
+    }
+
+    function isAuthorizedUser() {
+      return isSignedIn();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // LMO readings and refills
+    match /lmoEntries/{id} {
+      allow read: if isAuthorizedUser();
+      allow create: if isAuthorizedUser() && request.resource.data.by != null;
+      allow update: if isBootstrappedAdmin();
+      allow delete: if isBootstrappedAdmin();
+    }
+
+    // Cylinders master register
+    match /cylinders/{serial} {
+      allow read: if isAuthorizedUser();
+      allow create, update: if isAuthorizedUser();
+      allow delete: if isBootstrappedAdmin();
+    }
+
+    // Cylinder movement and lifecycle events
+    match /events/{id} {
+      allow read: if isAuthorizedUser();
+      allow create: if isAuthorizedUser() && request.resource.data.by != null;
+      allow update: if isBootstrappedAdmin();
+      allow delete: if isBootstrappedAdmin();
+    }
+
+    // Settings (wards, stock minimums, authorized emails)
+    match /settings/{settingId} {
+      allow read: if isAuthorizedUser();
+      allow create, update, delete: if isBootstrappedAdmin() || isAuthorizedUser();
+    }
+
+    // Test connection doc
+    match /test/{docId} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "MGPS Plant Console",
+  "description": "Mobile-first medical gas plant console for hospital technicians to manage LMO VIE tanks, flow monitoring, and cylinder movements with offline support and vision OCR.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,96 @@
+{
+  "entities": {
+    "LmoEntry": {
+      "title": "LmoEntry",
+      "description": "Log entry for Liquid Medical Oxygen VIE tank readings and refills",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "type": "string", "enum": ["reading", "refill"] },
+        "ts": { "type": "string" },
+        "a": { "type": "number", "description": "Tank A level in mmWC" },
+        "b": { "type": "number", "description": "Tank B level in mmWC" },
+        "online": { "type": "string", "enum": ["A", "B"] },
+        "tank": { "type": "string", "enum": ["A", "B", ""] },
+        "before": { "type": "number" },
+        "after": { "type": "number" },
+        "challanKg": { "type": "number" },
+        "photoA": { "type": "string" },
+        "photoB": { "type": "string" },
+        "by": { "type": "string" }
+      },
+      "required": ["kind", "ts", "by"]
+    },
+    "Cylinder": {
+      "title": "Cylinder",
+      "description": "Medical gas cylinder record",
+      "type": "object",
+      "properties": {
+        "serial": { "type": "string" },
+        "gas": { "type": "string" },
+        "type": { "type": "string" },
+        "valve": { "type": "string" },
+        "owner": { "type": "string" },
+        "status": { "type": "string", "enum": ["plant_full", "in_ward", "plant_empty", "at_supplier", "faulty"] },
+        "location": { "type": "string" },
+        "nextTest": { "type": "string" },
+        "lastTs": { "type": "string" },
+        "missing": { "type": "boolean" },
+        "faultNote": { "type": "string" }
+      },
+      "required": ["serial", "type", "status"]
+    },
+    "CylinderEvent": {
+      "title": "CylinderEvent",
+      "description": "Audit event log for cylinder movement or status change",
+      "type": "object",
+      "properties": {
+        "cylinderId": { "type": "string" },
+        "serial": { "type": "string" },
+        "gas": { "type": "string" },
+        "type": { "type": "string" },
+        "action": { "type": "string" },
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "fromLocation": { "type": "string" },
+        "location": { "type": "string" },
+        "doc": { "type": "string" },
+        "note": { "type": "string" },
+        "ts": { "type": "string" },
+        "by": { "type": "string" },
+        "photo": { "type": "string" }
+      },
+      "required": ["cylinderId", "serial", "action", "ts", "by"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "System settings such as wards, stock minimums, and authorized users",
+      "type": "object",
+      "properties": {
+        "key": { "type": "string" },
+        "data": { "type": "object" },
+        "updatedAt": { "type": "string" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": ["key"]
+    }
+  },
+  "firestore": {
+    "/lmoEntries/{id}": {
+      "schema": { "$ref": "LmoEntry" },
+      "description": "Collection of LMO tank readings and refill logs"
+    },
+    "/cylinders/{serial}": {
+      "schema": { "$ref": "Cylinder" },
+      "description": "Collection of all hospital medical gas cylinders keyed by normalised serial"
+    },
+    "/events/{id}": {
+      "schema": { "$ref": "CylinderEvent" },
+      "description": "Append-only movement and state history for cylinders"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "Setting" },
+      "description": "Configurable hospital wards, minimum stock thresholds, and authorized users"
+    }
+  }
+}
